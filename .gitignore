@@ -1,0 +1,58 @@
+# ========================
+# Python / Django
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# ========================
+# Node.js / React Native
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+# Keep package-lock.json if you want to lock versions,
+# but usually good to ignore if using Yarn.
+# If using npm, remove the line above.
+
+# Expo
+.expo/
+web-build/
+dist/
+
+# Android / iOS Native Builds (If you ever eject from Expo)
+android/
+ios/
+*.apk
+*.aab
+
+# ========================
+# IDEs / Editors
+# ========================
+# PyCharm
+.idea/
+*.iml
+
+# VS Code (Just in case)
+.vscode/
+
+# ========================
+# OS Generated Files
+# ========================
+.DS_Store
+Thumbs.db
