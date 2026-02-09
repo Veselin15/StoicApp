@@ -1,98 +1,131 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+// Define the shape of our data
+interface DailyData {
+  stoic_quote: string;
+  author: string;
+  daily_challenge: string;
+}
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [data, setData] = useState<DailyData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  // Keep your IP address here
+  const API_URL = 'http://192.168.1.105:8000/api/today/';
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((response) => response.json())
+      .then((json) => {
+        setData(json);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#000" />
+        <Text style={{marginTop: 10}}>Loading Wisdom...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+
+        <View style={styles.card}>
+          <Text style={styles.header}>DAILY STOIC</Text>
+
+          <View style={styles.divider} />
+
+          {/* FIX 1: Use &quot; instead of " */}
+          <Text style={styles.quote}>
+            &quot;{data?.stoic_quote || "No content available."}&quot;
+          </Text>
+
+          <Text style={styles.author}>
+            — {data?.author || "Unknown"}
+          </Text>
+
+          <View style={styles.challengeBox}>
+            {/* FIX 2: Use &apos; instead of ' */}
+            <Text style={styles.challengeLabel}>TODAY&apos;S MISSION</Text>
+            <Text style={styles.challengeText}>
+              {data?.daily_challenge || "Rest today."}
+            </Text>
+          </View>
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1, backgroundColor: '#EAEAEA' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 20 },
+  card: {
+    backgroundColor: '#FFFFFF',
+    padding: 30,
+    borderWidth: 3,
+    borderColor: '#000',
+    shadowColor: "#000",
+    shadowOffset: { width: 6, height: 6 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 10,
   },
-  stepContainer: {
-    gap: 8,
+  header: {
+    fontSize: 28,
+    fontWeight: '900',
+    textAlign: 'center',
+    letterSpacing: 4,
+    marginBottom: 10,
+    color: '#000',
+    textTransform: 'uppercase',
+  },
+  divider: { height: 3, backgroundColor: '#000', marginVertical: 20 },
+  quote: {
+    fontSize: 22,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginBottom: 25,
+    lineHeight: 34,
+    color: '#222',
+    fontWeight: '500',
+  },
+  author: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'right',
+    marginBottom: 30,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  challengeBox: { backgroundColor: '#000', padding: 20, marginTop: 10 },
+  challengeLabel: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '900',
     marginBottom: 8,
+    textAlign: 'center',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  challengeText: {
+    color: '#FFF',
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: '600',
+    lineHeight: 24,
   },
 });
