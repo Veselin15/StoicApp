@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, SafeAreaView, ScrollView } from 'react-native';
+import { useStreak } from '@/hooks/useStreak'; // <--- Import our new hook
 
 // Define the shape of our data
 interface DailyData {
@@ -11,8 +12,9 @@ interface DailyData {
 export default function HomeScreen() {
   const [data, setData] = useState<DailyData | null>(null);
   const [loading, setLoading] = useState(true);
+  const streak = useStreak(); // <--- Get the current streak
 
-  // Keep your IP address here
+  // ⚠️ YOUR IP IS STILL REQUIRED HERE
   const API_URL = 'http://192.168.1.105:8000/api/today/';
 
   useEffect(() => {
@@ -42,11 +44,15 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.card}>
+          {/* STREAK BADGE */}
+          <View style={styles.streakBadge}>
+            <Text style={styles.streakText}>🔥 {streak} DAY{streak !== 1 ? 'S' : ''}</Text>
+          </View>
+
           <Text style={styles.header}>DAILY STOIC</Text>
 
           <View style={styles.divider} />
 
-          {/* FIX 1: Use &quot; instead of " */}
           <Text style={styles.quote}>
             &quot;{data?.stoic_quote || "No content available."}&quot;
           </Text>
@@ -56,7 +62,6 @@ export default function HomeScreen() {
           </Text>
 
           <View style={styles.challengeBox}>
-            {/* FIX 2: Use &apos; instead of ' */}
             <Text style={styles.challengeLabel}>TODAY&apos;S MISSION</Text>
             <Text style={styles.challengeText}>
               {data?.daily_challenge || "Rest today."}
@@ -83,13 +88,31 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 0,
     elevation: 10,
+    position: 'relative', // Needed for absolute positioning of badge
   },
+  // NEW STYLES FOR STREAK
+  streakBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#000',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  streakText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  // END NEW STYLES
   header: {
     fontSize: 28,
     fontWeight: '900',
     textAlign: 'center',
     letterSpacing: 4,
     marginBottom: 10,
+    marginTop: 10, // Added space for badge
     color: '#000',
     textTransform: 'uppercase',
   },
