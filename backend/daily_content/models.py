@@ -9,3 +9,11 @@ class DailyNugget(models.Model):
 
     def __str__(self):
         return f"{self.date} - {self.author}"
+
+
+class JournalEntry(models.Model):
+    date = models.DateField(auto_now_add=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return f"Journal - {self.date}"
